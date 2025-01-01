@@ -70,7 +70,7 @@ app.use("/api", CartRoutes);
 app.use("/api", FavoriteRoutes);
 
 // Cloudinary configuration
-cloudinaryConfig();
+// cloudinaryConfig();
 
 // Start server
 const PORT = process.env.PORT || 3000;
