@@ -36,7 +36,7 @@ GitHubRoutes.get(
     SendCookie(res, token);
 
     // Redirect to your frontend (React) app
-    res.redirect("https://gadgets-heaven-1.onrender.com/");
+    res.redirect(URL);
   }
 );
 
