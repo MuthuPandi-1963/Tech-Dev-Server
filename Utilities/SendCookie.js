@@ -5,8 +5,9 @@ const SendCookie = (res,token)=>{
         HttpOnly :true,
         secure :process.env.NODE_ENV === 'production',
         maxAge : 7 * 24 * 60 * 60 * 1000 ,
-        sameSite : 'lax',
-        path : '/'
+        sameSite : 'None',
+        path : '/',
+        domain : process.env.NODE_ENV === 'production' ? "https://tech-dev-server.onrender.com" : "http://localhost:3000"
     })
     return token
 }
