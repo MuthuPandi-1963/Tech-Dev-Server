@@ -4,7 +4,8 @@ import { VerifyToken } from "../../Utilities/JsonWenToken.js";
 const RefreshAuth = async (req, res) => {
     try {
         const token = req.cookies?.token;
-
+        console.log(token);
+        
         // Check if token exists
         if (!token) {
             return res.status(401).json({

@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { urlencoded } from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import ConnectDB from './DataBase/db.js';
@@ -26,8 +26,9 @@ const frontendGlobalUrl = process.env.FRONT_END_URL_GLOBAL
 
 const corsURL = environment === "production" ? frontendGlobalUrl : frontendLocalUrl
 // Middlewares
-app.use(express.json()); // Parse JSON bodies
-app.use(cookieParser()); 
+app.use(express.json()); 
+app.use(urlencoded())// Parse JSON bodies
+app.use(cookieParser(process.env.SESSION_SECRET)); 
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
