@@ -1,14 +1,16 @@
-const SendCookie = (res,token)=>{
+const SendCookie = (res, token) => {
     console.log(token);
-    
-    res.cookie("token",token,{
-        HttpOnly :true,
-        secure :process.env.NODE_ENV === 'production',
-        maxAge : 7 * 24 * 60 * 60 * 1000 ,
-        sameSite : 'None',
-        path : '/',
-        domain : process.env.NODE_ENV === 'production' ? "https://tech-dev-server.onrender.com" : "http://localhost:3000"
-    })
-    return token
-}
+
+    res.cookie("token", token, {
+        httpOnly: true, // Correct casing for httpOnly
+        secure: process.env.NODE_ENV === 'production', // Secure cookies in production
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+        sameSite: 'None', // Allows cross-origin cookies
+        path: '/', // Cookie path
+        domain: process.env.NODE_ENV === 'production' ? "tech-dev-server.onrender.com" : "localhost" // Hostname only, no protocol
+    });
+
+    return token;
+};
+
 export default SendCookie;
