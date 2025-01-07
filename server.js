@@ -37,7 +37,7 @@ app.use(
     cookie: { httpOnly: true, secure: environment === "production",sameSite:"None" },
   })
 );
-  
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(cors({
@@ -60,6 +60,9 @@ app.use("/api",OrderRoutes)
 app.use("/api",CartRoutes)
 app.use("/api",FavoriteRoute)
 
+app.get("/",(req,res)=>{
+  res.json({message :"Welcome to Tech-Dev"})
+})
 // Starting the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
