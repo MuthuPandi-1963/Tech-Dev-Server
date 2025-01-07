@@ -5,8 +5,11 @@ import UserModel from '../../Models/UserModels.js';
 const appLocalUrl = process.env.APPLICATION_URL_LOCAL;
 const appGlobalUrl = process.env.APPLICATION_URL_GLOBAL;
 const environment = process.env.NODE_ENV;
-
 const URL = environment === "production" ? appGlobalUrl : appLocalUrl;
+
+console.log(process.env.GITHUB_CLIENT_ID);
+console.log(process.env.GITHUB_CLIENT_SECRET);
+console.log(URL);
 
 passport.use(new passportGithub.Strategy(
     {
