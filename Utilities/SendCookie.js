@@ -5,8 +5,8 @@ const SendCookie = (res, token) => {
         httpOnly: true, // Correct casing for httpOnly
         secure: process.env.NODE_ENV === 'production', // Secure cookies in production
         maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-        sameSite: 'None', // Allows cross-origin cookies
-        path: '/', // Cookie path
+        sameSite: 'Lax', // Allows cross-origin cookies
+        // path: '/', // Cookie path
         domain: process.env.NODE_ENV === 'production' ? "tech-dev-server.onrender.com" : "localhost" // Hostname only, no protocol
     });
 

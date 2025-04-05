@@ -40,6 +40,8 @@ app.use(
 
 app.use(passport.initialize());
 app.use(passport.session());
+console.log("URL" ,corsURL);
+
 app.use(cors({
     origin:corsURL, // Frontend URL
     credentials: true, // Allow cookies to be sent in requests
