@@ -1,3 +1,4 @@
+// routes/GithubRoutes.js
 import passport from 'passport';
 import { Router } from 'express';
 import SendCookie from '../Utilities/SendCookie.js';
@@ -9,52 +10,54 @@ const appGlobalUrl = process.env.FRONT_END_URL_GLOBAL;
 const environment = process.env.NODE_ENV;
 
 const URL = environment === "production" ? appGlobalUrl : appLocalUrl;
-// Route for GitHub OAuth
+
+// 👉 Route to start GitHub login
 GitHubRoutes.get(
   "/github",
   passport.authenticate("github", {
-    scope: ["user:email"], // You can request more scopes if needed
+    scope: ["user:email"], // Optional: ["user:email", "read:user"]
   })
 );
 
-// Route for GitHub OAuth Callback
+// 👉 GitHub OAuth Callback
 GitHubRoutes.get(
   "/github/callback",
   passport.authenticate("github", {
     failureRedirect: URL,
   }),
-  (req, res) => {
-    // Send the user data and message to the frontend
-    
-    req.session.user = req.user;
-    console.log("GitHub User: ", req.user);
+  async (req, res) => {
+    try {
+      if (!req.user) throw new Error("User not found in GitHub callback");
 
-    // Create a JWT token for the user
-    const token = CreateToken(req.user.id);
+      req.session.user = req.user;
+      console.log("GitHub User: ", req.user);
 
-    // Send the token as a cookie
-    SendCookie(res, token);
+      const token = CreateToken(req.user._id);
+      SendCookie(res, token);
 
-    // Redirect to your frontend (React) app
-    res.redirect(URL);
+      res.redirect(URL);
+    } catch (err) {
+      console.error("GitHub Auth Error:", err);
+      res.redirect(`${URL}?auth=fail`);
+    }
   }
 );
 
-// Route to get user info (optional)
+// 👉 Get current user (optional)
 GitHubRoutes.get("/user", (req, res) => {
-  console.log(req.session.user);
-
   if (req.session && req.session.user) {
-    res.json({
-      user: req.session.user,
-      success: true,
-    });
-  } else {
-    res.json({
-      message: "No user found",
-      success: false,
-    });
+    return res.json({ user: req.session.user, success: true });
   }
+  res.json({ message: "No user found", success: false });
+});
+
+// 👉 Logout
+GitHubRoutes.get("/logout", (req, res) => {
+  req.logout(() => {
+    req.session.destroy();
+    res.clearCookie("token");
+    res.redirect(URL);
+  });
 });
 
 export default GitHubRoutes;

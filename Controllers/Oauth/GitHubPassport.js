@@ -18,29 +18,32 @@ passport.use(new passportGithub.Strategy(
       callbackURL: `${URL}/oauth/github/callback`
     },
     async (accessToken, refreshToken, profile, done) => {
-      const existingUser = await UserModel.findOne({ authId: profile.id });
-      // console.log(profile);
-      
-      if (existingUser) {
-        // If user exists, update the user status to logged in and return the user
-        existingUser.isLoggedIn = true;
-        await existingUser.save();
-        return done(null, existingUser);
-      } else {
-        // If user doesn't exist, create a new user
-        const newUser = new UserModel({
-          authType: 'Github',
-          authId: profile.id,
-          email: profile.email || `githubUser${profile.id}@gmail.com`,  // Use Google email
-          username: profile.username,  // Use Google profile name
-          isLoggedIn: true,
-          isVerified :true
-        });
+  try {
+    const existingUser = await UserModel.findOne({ authId: profile.id });
 
-        await newUser.save();
-        return done(null, newUser);
-      }
+    if (existingUser) {
+      existingUser.isLoggedIn = true;
+      await existingUser.save();
+      return done(null, existingUser);
+    } else {
+      const newUser = new UserModel({
+        authType: 'Github',
+        authId: profile.id,
+        email: profile.emails?.[0]?.value || `githubUser${profile.id}@gmail.com`,
+        username: profile.username,
+        isLoggedIn: true,
+        isVerified: true
+      });
+
+      await newUser.save();
+      return done(null, newUser);
     }
+  } catch (err) {
+    console.error('GitHub Strategy Error:', err);
+    return done(err);
+  }
+}
+
   ));
   
   // Serialize user into session

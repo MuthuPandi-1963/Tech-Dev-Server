@@ -11,47 +11,55 @@ const URL = environment === "production" ? appGlobalUrl : appLocalUrl;
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID, // Add your Google client ID here
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET, // Add your Google client secret here
-      callbackURL: `${URL}/auth/google/callback`, // Adjust based on your server URL
+      clientID: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: `${URL}/auth/google/callback`,
     },
     async (accessToken, refreshToken, profile, done) => {
-      // Check if the user already exists in the database
-      const existingUser = await UserModel.findOne({ authId: profile.id });
+      try {
+        // Optional: Debug log
+        // console.log('Google Profile:', JSON.stringify(profile, null, 2));
 
-      if (existingUser) {
-        // If user exists, update the user status to logged in and return the user
-        existingUser.isLoggedIn = true;
-        await existingUser.save();
-        return done(null, existingUser);
-      } else {
-        // If user doesn't exist, create a new user
+        const existingUser = await UserModel.findOne({ authId: profile.id });
+
+        if (existingUser) {
+          existingUser.isLoggedIn = true;
+          await existingUser.save();
+          return done(null, existingUser);
+        }
+
+        // Fallback for email if Google does not return one
+        const fallbackEmail = `googleUser${profile.id}@example.com`;
+        const email = profile.emails?.[0]?.value || fallbackEmail;
+
         const newUser = new UserModel({
           authType: 'Google',
           authId: profile.id,
-          email: profile.emails[0].value, // Use Google email
-          username: profile.displayName, // Use Google profile name
+          email,
+          username: profile.displayName,
           isLoggedIn: true,
-          isVerified: true
+          isVerified: true,
         });
 
         await newUser.save();
         return done(null, newUser);
+      } catch (error) {
+        console.error('Google Strategy Error:', error);
+        return done(error);
       }
     }
   )
 );
 
+// Serialize and Deserialize
 passport.serializeUser((user, done) => {
-  done(null, user._id); // Store the user's _id in the session
+  done(null, user._id);
 });
 
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await UserModel.findById(id);
-    if (!user) {
-      return done(new Error('User not found'));
-    }
+    if (!user) return done(new Error('User not found'));
     done(null, user);
   } catch (error) {
     done(error);
