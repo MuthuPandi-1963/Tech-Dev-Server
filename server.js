@@ -56,7 +56,7 @@ app.use((req, res, next) => {
 app.set('trust proxy', 1); // Trust first proxy
 // Auth routes
 app.use('/api', authRouter);
-app.use("/auth",GoogleRoutes);
+app.use("/oauth",GoogleRoutes);
 app.use("/oauth",GitHubRoutes);
 app.use("/api",ProductRoutes)
 app.use("/api",OrderRoutes)
